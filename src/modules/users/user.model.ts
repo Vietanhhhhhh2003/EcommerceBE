@@ -1,12 +1,14 @@
 import { Schema, model, type HydratedDocument, type Model } from "mongoose";
 
 export type UserRole = "user" | "admin";
+export type UserStatus = "active" | "disabled";
 
 export interface IUser {
   email: string;
   passwordHash: string;
   name: string;
   role: UserRole;
+  status: UserStatus;
   refreshTokenHash?: string | null;
   refreshTokenExpiresAt?: Date | null;
   createdAt: Date;
@@ -20,6 +22,7 @@ export interface SafeUser {
   email: string;
   name: string;
   role: UserRole;
+  status: UserStatus;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +53,12 @@ const userSchema = new Schema<IUser>(
       default: "user",
       required: true
     },
+    status: {
+      type: String,
+      enum: ["active", "disabled"],
+      default: "active",
+      required: true
+    },
     refreshTokenHash: {
       type: String,
       default: null,
@@ -72,6 +81,7 @@ export const toSafeUser = (user: UserDocument): SafeUser => {
     email: user.email,
     name: user.name,
     role: user.role,
+    status: user.status,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt
   };
