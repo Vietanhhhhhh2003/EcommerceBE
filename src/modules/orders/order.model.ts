@@ -1,6 +1,8 @@
 import { Schema, model, type HydratedDocument, type Model, Types } from "mongoose";
 
 export type OrderStatus = "pending" | "confirmed" | "cancelled" | "completed";
+export type PaymentMethod = "vnpay" | "cod";
+export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed" | "refunded";
 
 export interface IOrderItemSnapshot {
   productId: Types.ObjectId;
@@ -17,6 +19,13 @@ export interface IOrder {
   items: IOrderItemSnapshot[];
   totalAmount: number;
   status: OrderStatus;
+  paymentMethod?: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  paymentTransactionId?: string;
+  paymentAmount?: number;
+  paidAt?: Date;
+  vnpayResponseCode?: string;
+  vnpayTxnRef?: string;
   stockRestored: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -92,6 +101,41 @@ const orderSchema = new Schema<IOrder>(
       required: true,
       min: 0
     },
+    paymentMethod: {
+      type: String,
+      enum: ["vnpay", "cod"],
+      required: false
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["unpaid", "pending", "paid", "failed", "refunded"],
+      default: "unpaid",
+      required: true
+    },
+    paymentTransactionId: {
+      type: String,
+      required: false,
+      trim: true
+    },
+    paymentAmount: {
+      type: Number,
+      required: false,
+      min: 0
+    },
+    paidAt: {
+      type: Date,
+      required: false
+    },
+    vnpayResponseCode: {
+      type: String,
+      required: false,
+      trim: true
+    },
+    vnpayTxnRef: {
+      type: String,
+      required: false,
+      trim: true
+    },
     status: {
       type: String,
       enum: ["pending", "confirmed", "cancelled", "completed"],
@@ -111,5 +155,6 @@ const orderSchema = new Schema<IOrder>(
 );
 
 orderSchema.index({ createdAt: 1 });
+orderSchema.index({ vnpayTxnRef: 1 }, { unique: true, sparse: true });
 
 export const Order: Model<IOrder> = model<IOrder>("Order", orderSchema);
