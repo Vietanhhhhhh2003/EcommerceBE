@@ -7,6 +7,7 @@ export interface IUser {
   email: string;
   passwordHash: string;
   name: string;
+  avatarUrl?: string;
   role: UserRole;
   status: UserStatus;
   refreshTokenHash?: string | null;
@@ -21,6 +22,7 @@ export interface SafeUser {
   id: string;
   email: string;
   name: string;
+  avatarUrl?: string;
   role: UserRole;
   status: UserStatus;
   createdAt: Date;
@@ -45,6 +47,11 @@ const userSchema = new Schema<IUser>(
     name: {
       type: String,
       required: true,
+      trim: true
+    },
+    avatarUrl: {
+      type: String,
+      required: false,
       trim: true
     },
     role: {
@@ -80,6 +87,7 @@ export const toSafeUser = (user: UserDocument): SafeUser => {
     id: user.id,
     email: user.email,
     name: user.name,
+    avatarUrl: user.avatarUrl,
     role: user.role,
     status: user.status,
     createdAt: user.createdAt,

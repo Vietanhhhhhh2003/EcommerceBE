@@ -2,12 +2,12 @@
 
 ## Active Task
 
-009 - Notification and Upload Module
+010 - Swagger, Docker Finalization
 
 ## Active Task File
 
 ```txt
-agent/tasks/active/009-notification-and-upload-module.md
+agent/tasks/active/010-swagger-docker-finalization.md
 ```
 
 ## Status
@@ -16,9 +16,8 @@ Active
 
 ## Rules
 
-* Only implement task 009.
-* Do not implement Swagger or Docker finalization yet.
-* Do not move task 009 to `agent/tasks/done/` during implementation.
-* Do not move task 010 from `agent/tasks/backlog/` to `agent/tasks/active/` during implementation.
-* Do not update this file to task 010 during implementation.
+* Only implement task 010.
+* Do not implement new business modules.
+* Do not move task 010 to `agent/tasks/done/` during implementation.
+* Do not update this file to another task during implementation.
 * Task movement is allowed only after `agent/prompts/review-task.md` returns `Passed`, then `agent/prompts/advance-task.md` is run.

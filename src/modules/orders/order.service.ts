@@ -1,7 +1,12 @@
 import mongoose, { Types, type ClientSession } from "mongoose";
 import { HTTP_STATUS } from "../../common/constants/http-status";
 import { AppError } from "../../common/errors/app-error";
+import {
+  sendOrderCancelledEmail,
+  sendOrderCreatedEmail
+} from "../notifications/notification.service";
 import type { UserRole } from "../users/user.model";
+import { User } from "../users/user.model";
 import { Cart, type CartDocument } from "../cart/cart.model";
 import { Product, type IProduct } from "../products/product.model";
 import {
@@ -248,8 +253,23 @@ const restoreOrderStockIfNeeded = async (
   order.stockRestored = true;
 };
 
+const getOrderNotificationRecipient = async (
+  userId: string
+): Promise<{ email: string; name: string } | null> => {
+  const user = await User.findById(userId).select("email name");
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    email: user.email,
+    name: user.name
+  };
+};
+
 export const createOrder = async (userId: string): Promise<SafeOrder> => {
-  return runWithTransaction(async (session) => {
+  const order = await runWithTransaction(async (session) => {
     const { cart, candidates } = await buildOrderCandidates(userId, session);
     const items = buildSnapshotItems(candidates);
     const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
@@ -279,6 +299,14 @@ export const createOrder = async (userId: string): Promise<SafeOrder> => {
 
     return toSafeOrder(order);
   });
+
+  const recipient = await getOrderNotificationRecipient(userId);
+
+  if (recipient) {
+    await sendOrderCreatedEmail(recipient, order);
+  }
+
+  return order;
 };
 
 export const listMyOrders = async (
@@ -319,7 +347,7 @@ export const cancelOrder = async (
   userId: string,
   orderId: string
 ): Promise<SafeOrder> => {
-  return runWithTransaction(async (session) => {
+  const order = await runWithTransaction(async (session) => {
     const order = await Order.findById(orderId).session(session);
 
     if (!order) {
@@ -337,13 +365,21 @@ export const cancelOrder = async (
 
     return toSafeOrder(order);
   });
+
+  const recipient = await getOrderNotificationRecipient(userId);
+
+  if (recipient) {
+    await sendOrderCancelledEmail(recipient, order);
+  }
+
+  return order;
 };
 
 export const updateOrderStatus = async (
   orderId: string,
   input: UpdateOrderStatusInput
 ): Promise<SafeOrder> => {
-  return runWithTransaction(async (session) => {
+  const order = await runWithTransaction(async (session) => {
     const order = await Order.findById(orderId).session(session);
 
     if (!order) {
@@ -361,4 +397,14 @@ export const updateOrderStatus = async (
 
     return toSafeOrder(order);
   });
+
+  if (input.status === "cancelled") {
+    const recipient = await getOrderNotificationRecipient(order.userId);
+
+    if (recipient) {
+      await sendOrderCancelledEmail(recipient, order);
+    }
+  }
+
+  return order;
 };
