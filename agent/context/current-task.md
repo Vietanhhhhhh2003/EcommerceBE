@@ -2,12 +2,12 @@
 
 ## Active Task
 
-008 - VNPay Payment Module
+009 - Notification and Upload Module
 
 ## Active Task File
 
 ```txt
-agent/tasks/active/008-vnpay-payment-module.md
+agent/tasks/active/009-notification-and-upload-module.md
 ```
 
 ## Status
@@ -16,10 +16,9 @@ Active
 
 ## Rules
 
-* Only implement task 008.
-* Do not implement future tasks.
-* Do not implement notification, upload, Swagger, or Docker finalization yet.
-* Do not move task 008 to `agent/tasks/done/` until `agent/prompts/review-task.md` returns `Passed`.
-* Do not move task 009 from `agent/tasks/backlog/` to `agent/tasks/active/` during implementation.
-* Do not update this file to task 009 during implementation.
+* Only implement task 009.
+* Do not implement Swagger or Docker finalization yet.
+* Do not move task 009 to `agent/tasks/done/` during implementation.
+* Do not move task 010 from `agent/tasks/backlog/` to `agent/tasks/active/` during implementation.
+* Do not update this file to task 010 during implementation.
 * Task movement is allowed only after `agent/prompts/review-task.md` returns `Passed`, then `agent/prompts/advance-task.md` is run.
