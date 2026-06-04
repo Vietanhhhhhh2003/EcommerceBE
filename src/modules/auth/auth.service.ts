@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { HTTP_STATUS } from "../../common/constants/http-status";
 import { AppError } from "../../common/errors/app-error";
+import { sendWelcomeEmail } from "../notifications/notification.service";
 import {
   User,
   toSafeUser,
@@ -62,6 +63,10 @@ export const register = async (input: RegisterInput): Promise<AuthResult> => {
     name: input.name
   });
   const tokens = await issueTokens(user);
+  await sendWelcomeEmail({
+    email: user.email,
+    name: user.name
+  });
 
   return {
     user: toSafeUser(user),

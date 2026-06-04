@@ -1,5 +1,6 @@
 import { HTTP_STATUS } from "../../common/constants/http-status";
 import { AppError } from "../../common/errors/app-error";
+import { sendPaymentSuccessEmail } from "../notifications/notification.service";
 import {
   Order,
   type OrderDocument,
@@ -7,6 +8,7 @@ import {
   type PaymentMethod,
   type PaymentStatus
 } from "../orders/order.model";
+import { User } from "../users/user.model";
 import type {
   CreateVnpayPaymentInput,
   VnpayCallbackQuery,
@@ -158,6 +160,29 @@ const generateUniqueTxnRef = async (): Promise<string> => {
   throw new AppError("Failed to generate VNPay transaction reference", HTTP_STATUS.INTERNAL_SERVER_ERROR);
 };
 
+const sendPaymentSuccessNotification = async (
+  order: OrderDocument
+): Promise<void> => {
+  const user = await User.findById(order.userId).select("email name");
+
+  if (!user) {
+    return;
+  }
+
+  await sendPaymentSuccessEmail(
+    {
+      email: user.email,
+      name: user.name
+    },
+    {
+      id: order.id,
+      totalAmount: order.totalAmount,
+      status: order.status,
+      paymentTransactionId: order.paymentTransactionId
+    }
+  );
+};
+
 export const createVnpayPaymentUrl = async (
   userId: string,
   input: CreateVnpayPaymentInput,
@@ -211,6 +236,11 @@ export const handleVnpayReturn = async (
     };
   }
 
+  const shouldSendPaymentSuccessEmail = isSuccessfulVnpayResponse(
+    query.vnp_ResponseCode,
+    query.vnp_TransactionStatus
+  );
+
   if (isSuccessfulVnpayResponse(query.vnp_ResponseCode, query.vnp_TransactionStatus)) {
     applySuccessfulPayment(order, query);
   } else {
@@ -218,6 +248,10 @@ export const handleVnpayReturn = async (
   }
 
   await order.save();
+
+  if (shouldSendPaymentSuccessEmail) {
+    await sendPaymentSuccessNotification(order);
+  }
 
   return {
     order: toPaymentOrderSummary(order)
@@ -251,6 +285,11 @@ export const handleVnpayIpn = async (
     return buildIpnSuccessResponse("Order already confirmed");
   }
 
+  const shouldSendPaymentSuccessEmail = isSuccessfulVnpayResponse(
+    query.vnp_ResponseCode,
+    query.vnp_TransactionStatus
+  );
+
   if (isSuccessfulVnpayResponse(query.vnp_ResponseCode, query.vnp_TransactionStatus)) {
     applySuccessfulPayment(order, verifiedQuery);
   } else {
@@ -258,6 +297,10 @@ export const handleVnpayIpn = async (
   }
 
   await order.save();
+
+  if (shouldSendPaymentSuccessEmail) {
+    await sendPaymentSuccessNotification(order);
+  }
 
   return buildIpnSuccessResponse();
 };
