@@ -2,22 +2,18 @@
 
 ## Active Task
 
-010 - Swagger, Docker Finalization
+None
 
 ## Active Task File
 
-```txt
-agent/tasks/active/010-swagger-docker-finalization.md
-```
+None
 
 ## Status
 
-Active
+Completed
 
 ## Rules
 
-* Only implement task 010.
-* Do not implement new business modules.
-* Do not move task 010 to `agent/tasks/done/` during implementation.
-* Do not update this file to another task during implementation.
-* Task movement is allowed only after `agent/prompts/review-task.md` returns `Passed`, then `agent/prompts/advance-task.md` is run.
+- All planned MVP tasks are completed.
+- Do not implement new business modules without creating a new task first.
+- Do not move task files unless a new reviewed workflow requires it.

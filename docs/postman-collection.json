@@ -1,0 +1,33 @@
+{
+  "info": {
+    "name": "Express E-Commerce Backend API - MVP Demo",
+    "_postman_id": "c6d3941f-ef5c-4f9f-9f1e-010-swagger-docker-demo",
+    "description": "MVP demo flow collection using placeholder variables only.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "accessToken", "value": "change-me-access-secret" },
+    { "key": "adminAccessToken", "value": "change-me-access-secret" },
+    { "key": "productId", "value": "507f1f77bcf86cd799439012" },
+    { "key": "orderId", "value": "507f1f77bcf86cd799439014" },
+    { "key": "avatarFile", "value": "avatar-file-placeholder" },
+    { "key": "productImageFile", "value": "product-image-file-placeholder" }
+  ],
+  "item": [
+    { "name": "Health Check", "request": { "method": "GET", "url": "{{baseUrl}}/health" } },
+    { "name": "Register", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"demo@example.com\",\"password\":\"Password123!\",\"name\":\"Demo User\"}" }, "url": "{{baseUrl}}/api/auth/register" } },
+    { "name": "Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"demo@example.com\",\"password\":\"Password123!\"}" }, "url": "{{baseUrl}}/api/auth/login" } },
+    { "name": "Get Current User", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/api/auth/me" } },
+    { "name": "Admin Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"demo-admin@example.com\",\"password\":\"Password123!\"}" }, "url": "{{baseUrl}}/api/auth/login" } },
+    { "name": "Create Product", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminAccessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Demo Product\",\"slug\":\"demo-product\",\"description\":\"Placeholder product description\",\"price\":199000,\"category\":\"electronics\",\"stock\":12,\"status\":\"active\"}" }, "url": "{{baseUrl}}/api/products" } },
+    { "name": "List Products", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?page=1&limit=10&sort=newest" } },
+    { "name": "Add Product To Cart", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"productId\":\"{{productId}}\",\"quantity\":1}" }, "url": "{{baseUrl}}/api/cart/items" } },
+    { "name": "Get Cart", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/api/cart" } },
+    { "name": "Create Order", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/api/orders" } },
+    { "name": "List My Orders", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/api/orders/me?page=1&limit=10" } },
+    { "name": "Create VNPay Payment URL", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"orderId\":\"{{orderId}}\"}" }, "url": "{{baseUrl}}/api/payments/vnpay/create" } },
+    { "name": "Upload Avatar", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "body": { "mode": "formdata", "formdata": [{ "key": "avatar", "type": "file", "src": "{{avatarFile}}" }] }, "url": "{{baseUrl}}/api/uploads/avatar" } },
+    { "name": "Upload Product Image", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminAccessToken}}" }], "body": { "mode": "formdata", "formdata": [{ "key": "images", "type": "file", "src": "{{productImageFile}}" }] }, "url": "{{baseUrl}}/api/uploads/products" } }
+  ]
+}
