@@ -4,6 +4,7 @@ import { authRoutes } from "./modules/auth/auth.routes";
 import { userRoutes } from "./modules/users/user.routes";
 import { productRoutes } from "./modules/products/product.routes";
 import { cartRoutes } from "./modules/cart/cart.routes";
+import { orderRoutes } from "./modules/orders/order.routes";
 import { errorMiddleware } from "./common/middlewares/error.middleware";
 import { notFoundMiddleware } from "./common/middlewares/not-found.middleware";
 import { requestLoggerMiddleware } from "./common/middlewares/request-logger.middleware";
@@ -18,6 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
